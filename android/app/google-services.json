@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1069450090486",
+    "project_id": "prensensi-8365f",
+    "storage_bucket": "prensensi-8365f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069450090486:android:5df37b084c733dfca119d7",
+        "android_client_info": {
+          "package_name": "com.example.presensi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANCUrbStyYxDPhDGVzvMiq0qAfTw-b3o4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
