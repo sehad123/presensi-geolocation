@@ -34,6 +34,7 @@
 //   }
 // }
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -45,12 +46,13 @@ class NewPasswordController extends GetxController {
 
   void newPassword() async {
     if (newPassC.text.isEmpty) {
-      Get.snackbar("ERROR", "PASSWORD BARU HARUS DIISI");
+      showErrorDialog("ERROR", "PASSWORD BARU HARUS DIISI");
       return;
     }
 
     if (newPassC.text == "sehad123") {
-      Get.snackbar("ERROR", "PASSWORD BARU TIDAK BOLEH SAMA DENGAN YANG LAMA");
+      showErrorDialog(
+          "ERROR", "PASSWORD BARU TIDAK BOLEH SAMA DENGAN YANG LAMA");
       return;
     }
 
@@ -61,16 +63,36 @@ class NewPasswordController extends GetxController {
       await auth.signInWithEmailAndPassword(
           email: email, password: newPassC.text);
       Get.offAllNamed(Routes.HOME);
-      Get.snackbar("SUCESS ", "Password anda berhasil diperbarui");
+      showSuccessDialog("SUCESS ", "Password anda berhasil diperbarui");
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        Get.snackbar("Terjadi Kesalahan", "Password Anda terlalu lemah");
+        showErrorDialog("Terjadi Kesalahan", "Password Anda terlalu lemah");
       } else {
-        Get.snackbar("Terjadi Kesalahan", "Gagal mengganti password");
+        showErrorDialog("Terjadi Kesalahan", "Gagal mengganti password");
       }
     } catch (e) {
-      Get.snackbar(
+      showErrorDialog(
           "ERROR", "Tidak dapat membuat password baru. Hubungi admin.");
     }
+  }
+
+  void showErrorDialog(String title, String desc) {
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.error,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+    ).show();
+  }
+
+  void showSuccessDialog(String title, String desc) {
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.success,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+    ).show();
   }
 }

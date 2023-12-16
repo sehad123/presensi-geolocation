@@ -38,7 +38,8 @@ class HomeView extends GetView<HomeController> {
             if (snapshot.hasData) {
               Map<String, dynamic> user = snapshot.data!.data()!;
               String defaultImage =
-                  "https://ui-avatars.com/api/?name=${user['name']}";
+                  "https://ui-avatars.com/api/?name=${user['name'] ?? 'Default'}";
+
               return ListView(
                 padding: EdgeInsets.all(20),
                 children: [
@@ -88,16 +89,17 @@ class HomeView extends GetView<HomeController> {
                     ],
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   Container(
                     padding: EdgeInsets.all(20),
-                    height: 180,
+                    height: 150,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.grey[200],
                     ),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -105,21 +107,17 @@ class HomeView extends GetView<HomeController> {
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
                         Text(
-                          "${user['nim']}",
+                          user['role'] == 'dosen' || user['role'] == 'admin'
+                              ? "${user['nip']}"
+                              : "${user['nim']}",
                           style: TextStyle(
-                              fontSize: 25, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 10,
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           user['kelas'] != null
-                              ? "${user['kelas']}"
-                              : "${user['role']}",
+                              ? "${user['kelas'].toString().toUpperCase()}"
+                              : "${user['role'].toString().toUpperCase()}",
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
@@ -131,51 +129,123 @@ class HomeView extends GetView<HomeController> {
                   ),
                   Container(
                     padding: EdgeInsets.all(20),
-                    height: 80,
+                    height: 290,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.grey[200],
                     ),
-                    child:
-                        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                            stream: controller.streamTodayPresence(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                              Map<String, dynamic>? dataToday =
-                                  snapshot.data?.data();
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
+                    child: StreamBuilder<
+                            DocumentSnapshot<Map<String, dynamic>>>(
+                        stream: controller.streamTodayPresence(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          Map<String, dynamic>? dataToday =
+                              snapshot.data?.data();
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Center(
+                                child: Text(
+                                  "${dataToday?['date'] != null ? DateFormat.yMMMEd().format(DateTime.parse(dataToday!['date'])) : DateFormat.yMMMEd().format(DateTime.now())}",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Divider(
+                                color: Colors.grey[300],
+                                thickness: 2,
+                              ),
+                              Column(
                                 children: [
-                                  Column(
-                                    children: [
-                                      Text("Masuk"),
-                                      Text(dataToday?['masuk'] == null
-                                          ? "-"
-                                          : "${DateFormat.jms().format(DateTime.parse(dataToday!['masuk']['date']))}"),
-                                    ],
+                                  Text(
+                                    dataToday?['masuk']?['matkul'] == null
+                                        ? " "
+                                        : " ( ${dataToday?['masuk']?['matkul']} )",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                  Container(
-                                    width: 2,
-                                    height: 40,
-                                    color: Colors.grey,
-                                  ),
-                                  Column(
-                                    children: [
-                                      Text("Keluar"),
-                                      Text(dataToday?['keluar'] == null
-                                          ? "-"
-                                          : "${DateFormat.jms().format(DateTime.parse(dataToday!['keluar']['date']))}"),
-                                    ],
+                                  Text(dataToday?['masuk'] == null
+                                      ? ""
+                                      : "${DateFormat.jms().format(DateTime.parse(dataToday!['masuk']['date']))}"),
+                                  Text(
+                                    dataToday?['masuk']?['matkul'] == null
+                                        ? " "
+                                        : "  ${dataToday?['masuk']?['status']} ",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: dataToday?['masuk']?['status'] ==
+                                                'hadir'
+                                            ? Colors.green
+                                            : Colors.red),
                                   ),
                                 ],
-                              );
-                            }),
+                              ),
+                              Divider(
+                                color: Colors.grey[300],
+                                thickness: 2,
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    dataToday?['keluar']?['matkul'] == null
+                                        ? " "
+                                        : " ( ${dataToday?['keluar']?['matkul']} )",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(dataToday?['keluar'] == null
+                                      ? " "
+                                      : "${DateFormat.jms().format(DateTime.parse(dataToday!['keluar']['date']))}"),
+                                  Text(
+                                    dataToday?['keluar']?['matkul'] == null
+                                        ? " "
+                                        : "  ${dataToday?['keluar']?['status']} ",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: dataToday?['keluar']
+                                                    ?['status'] ==
+                                                'hadir'
+                                            ? Colors.green
+                                            : Colors.red),
+                                  ),
+                                ],
+                              ),
+                              Divider(
+                                color: Colors.grey[300],
+                                thickness: 2,
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    dataToday?['sesi']?['matkul'] == null
+                                        ? " "
+                                        : " ( ${dataToday?['sesi']?['matkul']} )",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(dataToday?['sesi'] == null
+                                      ? " "
+                                      : "${DateFormat.jms().format(DateTime.parse(dataToday!['sesi']['date']))}"),
+                                  Text(
+                                    dataToday?['sesi']?['matkul'] == null
+                                        ? " "
+                                        : "  ${dataToday?['sesi']?['status']} ",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: dataToday?['sesi']?['status'] ==
+                                                'hadir'
+                                            ? Colors.green
+                                            : Colors.red),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        }),
                   ),
                   SizedBox(
                     height: 20,
@@ -254,25 +324,67 @@ class HomeView extends GetView<HomeController> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                           ),
+                                          Divider(
+                                            color: Colors.grey[300],
+                                            thickness: 2,
+                                          ),
                                           Text(
-                                            "Masuk",
+                                            data['masuk']?['matkul'] == null
+                                                ? "   "
+                                                : " ( ${data['masuk']?['matkul']} )",
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           Text(data['masuk']?['date'] == null
-                                              ? "-"
-                                              : "${DateFormat.jms().format(DateTime.parse(data['masuk']!['date']))}"),
-                                          SizedBox(
-                                            height: 10,
+                                              ? " jam : -"
+                                              : "jam : ${DateFormat.jms().format(DateTime.parse(data['masuk']!['date']))}"),
+                                          Text(
+                                            "Status : ${data['masuk']?['status']}",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Divider(
+                                            color: Colors.grey[300],
+                                            thickness: 2,
                                           ),
                                           Text(
-                                            "keluar",
+                                            data['keluar']?['matkul'] == null
+                                                ? "  "
+                                                : " ( ${data['keluar']?['matkul']} )",
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           Text(data['keluar']?['date'] == null
-                                              ? "-"
-                                              : "${DateFormat.jms().format(DateTime.parse(data['keluar']!['date']))}"),
+                                              ? "jam : -"
+                                              : "jam : ${DateFormat.jms().format(DateTime.parse(data['keluar']!['date']))}"),
+                                          Text(
+                                            data['keluar']?['date'] == null
+                                                ? "Status : -  "
+                                                : "Status : ${data['keluar']?['status']}",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Divider(
+                                            color: Colors.grey[300],
+                                            thickness: 2,
+                                          ),
+                                          Text(
+                                            data['sesi']?['matkul'] == null
+                                                ? "  "
+                                                : "( ${data['sesi']?['matkul']} )",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(data['sesi']?['date'] == null
+                                              ? "jam : -"
+                                              : "jam : ${DateFormat.jms().format(DateTime.parse(data['sesi']!['date']))}"),
+                                          Text(
+                                            data['sesi']?['date'] == null
+                                                ? "Status : -  "
+                                                : "Status : ${data['sesi']?['status']}",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         ],
                                       ),
                                     ),

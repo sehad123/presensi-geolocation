@@ -27,9 +27,24 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                 ),
               ),
               SizedBox(
-                height: 20,
+                height: 10,
               ),
-              Text("Masuk", style: TextStyle(fontWeight: FontWeight.bold)),
+              Divider(
+                color: Colors.grey[300],
+                thickness: 2,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "( ${data['masuk']?['matkul']} )",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 5,
+              ),
               Text(
                 "jam : ${DateFormat.jms().format(DateTime.parse(data['masuk']['date']))}",
               ),
@@ -45,7 +60,25 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
               Text(
                 "Jarak : ${data['masuk']?['jarak'].toString().split(".").first} meter",
               ),
-              Text("Keluar", style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(
+                height: 10,
+              ),
+              Divider(
+                color: Colors.grey[300],
+                thickness: 2,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "( ${data['keluar']?['matkul']} )",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 5,
+              ),
               Text(
                 data['keluar']?['date'] == null
                     ? "Jam : -"
@@ -71,6 +104,40 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                 data['keluar']?['status'] == null
                     ? "Jarak : -"
                     : "Jarak : ${data['keluar']?['jarak'].toString().split(".").first} meter",
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Divider(
+                color: Colors.grey[300],
+                thickness: 2,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "( ${data['sesi']?['matkul']} )",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                "jam : ${DateFormat.jms().format(DateTime.parse(data['sesi']['date']))}",
+              ),
+              Text(
+                "posisi : ${data['sesi']!['lat']}, ${data['sesi']!['long']}",
+              ),
+              Text(
+                "status : ${data['sesi']?['status']}",
+              ),
+              Text(
+                "Alamat : ${data['sesi']?['address']}",
+              ),
+              Text(
+                "Jarak : ${data['sesi']?['jarak'].toString().split(".").first} meter",
               ),
             ]),
             decoration: BoxDecoration(

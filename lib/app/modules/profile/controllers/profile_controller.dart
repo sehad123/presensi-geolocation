@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presensi/app/routes/app_pages.dart';
 
@@ -14,7 +15,23 @@ class ProfileController extends GetxController {
   }
 
   void logout() async {
-    await auth.signOut();
-    Get.offAllNamed(Routes.LOGIN);
+    // Menampilkan konfirmasi menggunakan Get.dialog
+    Get.defaultDialog(
+      title: "Konfirmasi Logout",
+      content: Text("Apakah Anda yakin ingin logout?"),
+      cancel: ElevatedButton(
+        onPressed: () {
+          Get.back(); // Menutup dialog
+        },
+        child: Text("Batal"),
+      ),
+      confirm: ElevatedButton(
+        onPressed: () async {
+          await auth.signOut();
+          Get.offAllNamed(Routes.LOGIN);
+        },
+        child: Text("Logout"),
+      ),
+    );
   }
 }

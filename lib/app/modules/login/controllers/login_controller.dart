@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -51,13 +52,13 @@ class LoginController extends GetxController {
                         try {
                           await credential.user!.sendEmailVerification();
                           Get.back();
-                          Get.snackbar(
+                          showSuccessDialog(
                               "Berhasil", "Berhasil mengirim email verifikasi");
                           isLoading.value = false;
                         } catch (e) {
                           isLoading.value = false;
 
-                          Get.snackbar("ERROR",
+                          showErrorDialog("ERROR",
                               "Tidak dpaat mengirim email verifikasi hubungi admin");
                         }
                       },
@@ -70,19 +71,40 @@ class LoginController extends GetxController {
         isLoading.value = false;
 
         if (e.code == "wrong-password") {
-          Get.snackbar("ERROR", "Password lama anda salah");
+          showErrorDialog("ERROR", "Password lama anda salah");
         } else if (e.code == 'user-not-found') {
-          Get.snackbar("Terjadi Kesalahan", "Email Mahasiswa Tidak terdaftar");
+          showErrorDialog(
+              "Terjadi Kesalahan", "Email Mahasiswa Tidak terdaftar");
         } else {
-          Get.snackbar("ERROR", "${e.code.toLowerCase()}");
+          showErrorDialog("ERROR", "${e.code.toLowerCase()}");
         }
       } catch (e) {
         isLoading.value = false;
 
-        Get.snackbar("Terjadi Kesalahan", "Tidak dapat login");
+        showErrorDialog('Error', 'tidak dapat login');
       }
     } else {
-      Get.snackbar("Terjadi Kesalahan", "email dan Password wajib di isi");
+      showErrorDialog('Error', 'email dan password wajib diisi.');
     }
+  }
+
+  void showErrorDialog(String title, String desc) {
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.error,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+    ).show();
+  }
+
+  void showSuccessDialog(String title, String desc) {
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.success,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+    ).show();
   }
 }

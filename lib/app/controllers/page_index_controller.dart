@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -28,19 +29,26 @@ class PageIndexController extends GetxController {
           // "${placemark[0].name},${placemark[0].subLocality},${placemark[0].locality}";
 
           await updatePosition(position, address);
-          Get.snackbar(" Lokasi anda saat ini",
-              "${placemark[0].subLocality},${placemark[0].locality}");
-// address stis = -6.2311945,106.8670893
-          // cek jarak diantara 2 posisi
+
           double jarak = Geolocator.distanceBetween(
               -6.2311945, 106.8670893, position.latitude, position.longitude);
-
+          DateTime now = DateTime.now();
+          int currentHour = now.hour;
           // presensi
-          await presensi(position, address, jarak);
+          if (currentHour < 7 || currentHour > 18) {
+            showErrorDialog("ERROR",
+                "anda tidak bisa melakukan presensi di luar jam kerja ");
+          } else if (now.weekday == DateTime.saturday ||
+              now.weekday == DateTime.sunday) {
+            showErrorDialog("TIDAK BISA ABSEN", "Hari ini adalah hari libur");
+          } else {
+            await presensi(position, address, jarak);
+          }
         } else {
-          Get.snackbar("ERROR", dataResponse['message']);
+          showErrorDialog("ERROR", dataResponse['message']);
         }
         print("Asben BERHASiL ");
+        // showSuccessDialog("berhasil", "ABSEN BERHASIL");
 
         break;
       case 2:
@@ -52,104 +60,30 @@ class PageIndexController extends GetxController {
   }
 
   Future<void> presensi(Position position, String address, double jarak) async {
-    //
     String uid = auth.currentUser!.uid;
     CollectionReference<Map<String, dynamic>> collectionReference =
         await firebaseFirestore
             .collection("mahasiswa")
             .doc(uid)
             .collection("presensi");
-    QuerySnapshot<Map<String, dynamic>> snappresence =
-        await collectionReference.get();
 
-    DateTime now = DateTime.now();
-    String todayDocId = DateFormat.yMd().format(now).replaceAll("/", "-");
+    // String status = "Di luar area";
 
-    String status = "Di luar area";
-    if (jarak <= 200) {
+    if (jarak <= 50000) {
       // didalam area kampus
-      status = "Di Dalam area kampus";
-    } else {
-      Get.snackbar("TIDAK BISA ABSEN", "ANDA BERADA DI LUAR KAMPUS");
-    }
 
-    if (snappresence.docs.length == 0) {
-      // belum pernah absen & set absen masuk pertama kalinya
-      await Get.defaultDialog(
-        title: "Peringatan",
-        middleText: "Apakah kamu yakin akan mengisi daftar hadir sekarang ?",
-        actions: [
-          OutlinedButton(
-              onPressed: () {
-                Get.back();
-              },
-              child: Text("Cancel")),
-          ElevatedButton(
-              onPressed: () async {
-                await collectionReference.doc(todayDocId).set({
-                  "date": now.toIso8601String(),
-                  "masuk": {
-                    "date": now.toIso8601String(),
-                    "lat": position.latitude,
-                    "long": position.longitude,
-                    "address": address,
-                    "status": status,
-                    "jarak": jarak,
-                  }
-                });
-                Get.back();
-                Get.snackbar("berhasil", "ABSEN BERHASIL");
-              },
-              child: Text("Iya"))
-        ],
-      );
-    } else {
-      //  sudah pernah absen -> cek hari ini apakah udah absen masuk / keluar
-      DocumentSnapshot<Map<String, dynamic>> todayDoc =
-          await collectionReference.doc(todayDocId).get();
-      if (todayDoc.exists == true) {
-        //  tinggal absen keluar / sudah absen masuk & keluar
-        Map<String, dynamic>? dataPresensiToday = todayDoc.data();
-        if (dataPresensiToday?['keluar'] != null) {
-          //  sudah absen masuk & keluar
-          Get.snackbar("PERINGATAN",
-              "Kamu telah absen masuk & keluar. tidak dapat absen lagi dan tunggu besok");
-        } else {
-          // absen keluar
-          await Get.defaultDialog(
-            title: "Peringatan",
-            middleText:
-                "Apakah kamu yakin akan mengisi absen keluar sekarang ?",
-            actions: [
-              OutlinedButton(
-                  onPressed: () {
-                    Get.back();
-                  },
-                  child: Text("Cancel")),
-              ElevatedButton(
-                  onPressed: () async {
-                    await collectionReference.doc(todayDocId).update({
-                      "keluar": {
-                        "date": now.toIso8601String(),
-                        "lat": position.latitude,
-                        "long": position.longitude,
-                        "address": address,
-                        "status": status,
-                        "jarak": jarak,
-                      }
-                    });
-                    Get.back();
-                    Get.snackbar("berhasil", "ABSEN BERHASIL");
-                    Get.back();
-                  },
-                  child: Text("Iya"))
-            ],
-          );
-        }
-      } else {
+      // Absensi sesuai kondisi di atas
+      QuerySnapshot<Map<String, dynamic>> snappresence =
+          await collectionReference.get();
+      DateTime now = DateTime.now();
+      String todayDocId = DateFormat.yMd().format(now).replaceAll("/", "-");
+
+      if (snappresence.docs.length == 0) {
+        // belum pernah absen & set absen masuk pertama kalinya
         await Get.defaultDialog(
           title: "Peringatan",
-          middleText: "Apakah kamu yakin akan mengisi daftar hadir sekarang ?",
+          middleText:
+              "Apakah kamu yakin akan mengisi daftar hadir pertama sekarang ?",
           actions: [
             OutlinedButton(
                 onPressed: () {
@@ -158,24 +92,207 @@ class PageIndexController extends GetxController {
                 child: Text("Cancel")),
             ElevatedButton(
                 onPressed: () async {
-                  await collectionReference.doc(todayDocId).set({
-                    "date": now.toIso8601String(),
-                    "masuk": {
+                  DateTime now = DateTime.now();
+                  int currentHour = now.hour;
+                  int currentMinute = now.minute;
+                  // presensi
+                  if (currentHour == 7 &&
+                      currentMinute >= 0 &&
+                      currentMinute <= 30) {
+                    await collectionReference.doc(todayDocId).set({
                       "date": now.toIso8601String(),
-                      "lat": position.latitude,
-                      "long": position.longitude,
-                      "address": address,
-                      "status": status,
-                    }
-                  });
-                  Get.back();
-                  Get.snackbar("berhasil", "ABSEN BERHASIL");
+                      "masuk": {
+                        "date": now.toIso8601String(),
+                        "lat": position.latitude,
+                        "long": position.longitude,
+                        "address": address,
+                        "status": "Hadir",
+                        "jarak": jarak,
+                      }
+                    });
+                    Get.back();
+                    showSuccessDialog("BERHASIL", "Anda berhasil absen");
+                  } else if (currentHour == 7 &&
+                      currentMinute > 30 &&
+                      currentHour <= 8) {
+                    await collectionReference.doc(todayDocId).set({
+                      "date": now.toIso8601String(),
+                      "masuk": {
+                        "date": now.toIso8601String(),
+                        "lat": position.latitude,
+                        "long": position.longitude,
+                        "address": address,
+                        "status": "Terlambat",
+                        "jarak": jarak,
+                      }
+                    });
+                    Get.back();
+                    showWarningDialog("WARNING", "Anda terlambat absen");
+                  } else {
+                    await collectionReference.doc(todayDocId).set({
+                      "date": now.toIso8601String(),
+                      "masuk": {
+                        "date": now.toIso8601String(),
+                        "lat": position.latitude,
+                        "long": position.longitude,
+                        "address": address,
+                        "status": "Tidak Hadir",
+                        "jarak": jarak,
+                      }
+                    });
+                    Get.back();
+                    showWarningDialog("WARNING",
+                        "Anda absen diluar jam ketentuan jadi dianggap Tidak Hadir harap lapor ke BAAK");
+                  }
                 },
                 child: Text("Iya"))
           ],
         );
-        // absen masuk
+      } else {
+        //  sudah pernah absen -> cek hari ini apakah udah absen masuk / keluar
+        DocumentSnapshot<Map<String, dynamic>> todayDoc =
+            await collectionReference.doc(todayDocId).get();
+        if (todayDoc.exists == true) {
+          //  tinggal absen keluar / sudah absen masuk & keluar
+          Map<String, dynamic>? dataPresensiToday = todayDoc.data();
+          if (dataPresensiToday?['keluar'] != null) {
+            //  sudah absen masuk & keluar
+            showErrorDialog("PERINGATAN",
+                "Kamu telah absen masuk & pulang. tidak dapat absen lagi dan tunggu besok");
+          } else {
+            // absen keluar
+            await Get.defaultDialog(
+              title: "Peringatan",
+              middleText:
+                  "Apakah kamu yakin akan mengisi absen Pulang sekarang ?",
+              actions: [
+                OutlinedButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: Text("Cancel")),
+                ElevatedButton(
+                    onPressed: () async {
+                      DateTime now = DateTime.now();
+                      int currentHour = now.hour;
+                      int currentMinute = now.minute;
+                      if (currentHour < 15) {
+                        Get.back();
+                        showWarningDialog(
+                            "WARNING", "anda belum bisa absen pulang sekarang");
+                      } else if (currentHour == 15 &&
+                          currentMinute > 0 &&
+                          currentHour <= 16) {
+                        await collectionReference.doc(todayDocId).update({
+                          "keluar": {
+                            "date": now.toIso8601String(),
+                            "lat": position.latitude,
+                            "long": position.longitude,
+                            "address": address,
+                            "status": "hadir",
+                            "jarak": jarak,
+                          }
+                        });
+                        Get.back();
+                        showSuccessDialog(
+                            "berhasil", "Anda berhasil absen pulang");
+                      } else if (currentHour > 16) {
+                        Get.back();
+                        showErrorDialog("WARNING",
+                            "anda absen diluar jam kerja harap besok besok jangan lupa absen pulang");
+                        await collectionReference.doc(todayDocId).update({
+                          "keluar": {
+                            "date": now.toIso8601String(),
+                            "lat": position.latitude,
+                            "long": position.longitude,
+                            "address": address,
+                            "status": "hadir",
+                            "jarak": jarak,
+                          }
+                        });
+                      }
+                    },
+                    child: Text("Iya"))
+              ],
+            );
+          }
+        } else {
+          await Get.defaultDialog(
+            title: "Peringatan",
+            middleText:
+                "Apakah kamu yakin akan mengisi daftar hadir sekarang ?",
+            actions: [
+              OutlinedButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  child: Text("Cancel")),
+              ElevatedButton(
+                  onPressed: () async {
+                    DateTime now = DateTime.now();
+                    int currentHour = now.hour;
+                    int currentMinute = now.minute;
+                    // presensi
+                    if (currentHour == 7 &&
+                        currentMinute >= 0 &&
+                        currentMinute <= 30) {
+                      await collectionReference.doc(todayDocId).set({
+                        "date": now.toIso8601String(),
+                        "masuk": {
+                          "date": now.toIso8601String(),
+                          "lat": position.latitude,
+                          "long": position.longitude,
+                          "address": address,
+                          "status": "hadir",
+                          "jarak": jarak,
+                        }
+                      });
+                      Get.back();
+                      showSuccessDialog(
+                          "BERHASUK", "Anda berhasil melakukan absen");
+                      Get.back();
+                    } else if (currentHour == 7 &&
+                        currentMinute > 30 &&
+                        currentHour <= 8) {
+                      await collectionReference.doc(todayDocId).set({
+                        "date": now.toIso8601String(),
+                        "masuk": {
+                          "date": now.toIso8601String(),
+                          "lat": position.latitude,
+                          "long": position.longitude,
+                          "address": address,
+                          "status": "terlambat",
+                          "jarak": jarak,
+                        }
+                      });
+                      Get.back();
+                      showWarningDialog("WARNING", "Anda terlambat absen");
+                    } else {
+                      await collectionReference.doc(todayDocId).set({
+                        "date": now.toIso8601String(),
+                        "masuk": {
+                          "date": now.toIso8601String(),
+                          "lat": position.latitude,
+                          "long": position.longitude,
+                          "address": address,
+                          "status": "tidak hadir",
+                          "jarak": jarak,
+                        }
+                      });
+                      Get.back();
+                      showWarningDialog("WARNING",
+                          "anda dianggap tidak hadir segera lapor ke BAAK");
+                    }
+                  },
+                  child: Text("Iya"))
+            ],
+          );
+          // absen masuk
+        }
       }
+    } else {
+      showErrorDialog("TIDAK BISA ABSEN",
+          "ANDA BERADA DI LUAR KAMPUS dengan jarak ${jarak.toString().split(".").first} meter");
     }
   }
 
@@ -194,25 +311,14 @@ class PageIndexController extends GetxController {
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
       return {"message": "Hidupkan GPS anda", "error": true};
-
-      // Future.error('Location services are disabled.');
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
         return {"message": "izin menggunakan GPS ditolak.", "error": true};
-        // Future.error('Location permissions are denied');
       }
     }
 
@@ -223,12 +329,8 @@ class PageIndexController extends GetxController {
             "settingan hp kamu tidak mengijinkan untuk mengakses GPS, ubah settingan hp kamu",
         "error": true
       };
-
-      //  Future.error(
-      // 'Location permissions are permanently denied, we cannot request permissions.');
     }
 
-    // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     Position position = await Geolocator.getCurrentPosition();
     return {
@@ -236,5 +338,35 @@ class PageIndexController extends GetxController {
       "message": "Berhasil mendapatkan posisi device",
       "error": false
     };
+  }
+
+  void showErrorDialog(String title, String desc) {
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.error,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+    ).show();
+  }
+
+  void showSuccessDialog(String title, String desc) {
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.success,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+    ).show();
+  }
+
+  void showWarningDialog(String title, String desc) {
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.warning,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+    ).show();
   }
 }

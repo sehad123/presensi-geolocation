@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,15 +12,8 @@ import 'package:firebase_storage/firebase_storage.dart' as s;
 
 class UpdateProfileController extends GetxController {
   RxBool isLoading = false.obs;
-  TextEditingController nameC = TextEditingController();
   TextEditingController nimC = TextEditingController();
-  TextEditingController emailC = TextEditingController();
-  final List<String> classes = [
-    "D4 Statistika",
-    "D4 Komputasi Statistik",
-    "D3 Statistik"
-  ];
-  RxString selectedKelas = "".obs;
+
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   s.FirebaseStorage storage = s.FirebaseStorage.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -37,11 +31,11 @@ class UpdateProfileController extends GetxController {
   }
 
   Future<void> updateProfile(String uid) async {
-    if (nameC.text.isNotEmpty) {
+    if (nimC.text.isNotEmpty) {
       try {
         isLoading.value = true;
         Map<String, dynamic> data = {
-          "name": nameC.text,
+          "no hp": nimC.text,
         };
         if (image != null) {
           //  proses upload image ke firebase
@@ -57,32 +51,17 @@ class UpdateProfileController extends GetxController {
         await firestore.collection("mahasiswa").doc(uid).update(data);
         image = null;
 
-        Get.snackbar(
-          "Sukses",
-          "Profil berhasil diperbarui",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
         isLoading.value = false;
 
         Get.offAllNamed(Routes.PROFILE);
+        showSuccessDialog("SUCESS", "profile berhasil diperbarui");
       } catch (e) {
-        Get.snackbar(
-          "Error",
-          "Gagal memperbarui profil. Silakan coba lagi.",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        showErrorDialog('Error', 'gagal memperbarui profile.');
       } finally {
         isLoading.value = false;
       }
     } else {
-      Get.snackbar(
-        "Peringatan",
-        "Nama tidak boleh kosong",
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-      );
+      showErrorDialog('Error', 'nama tidak boleh kosong');
     }
   }
 
@@ -95,20 +74,10 @@ class UpdateProfileController extends GetxController {
       update();
       // notifikasi
       Get.back();
-      Get.snackbar(
-        "Sukses",
-        "Profil berhasil dihapus",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+      showSuccessDialog("SUCCES", "Profile berhasil di hapus");
     } catch (e) {
       // notifikasi
-      Get.snackbar(
-        "Peringatan",
-        "Tidak dapat delet profile",
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-      );
+      showErrorDialog('Error', 'tidak dapat delete profile.');
     } finally {
       update();
     }
@@ -117,5 +86,25 @@ class UpdateProfileController extends GetxController {
   Stream<DocumentSnapshot<Map<String, dynamic>>> streamUser() {
     String uid = auth.currentUser!.uid;
     return firestore.collection("mahasiswa").doc(uid).snapshots();
+  }
+
+  void showErrorDialog(String title, String desc) {
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.error,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+    ).show();
+  }
+
+  void showSuccessDialog(String title, String desc) {
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.success,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+    ).show();
   }
 }

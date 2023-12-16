@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -34,23 +35,43 @@ class UpdatePasswordController extends GetxController {
               email: emailUser, password: newPassC.text);
 
           Get.back();
-          Get.snackbar("BERHASIL", "Update Password Berhasil");
+          showSuccessDialog("BERHASIL", "Update Password Berhasil");
         } on FirebaseAuthException catch (e) {
           if (e.code == "wrong-password") {
-            Get.snackbar("ERROR", "Password lama anda salah");
+            showErrorDialog("ERROR", "Password lama anda salah");
           } else {
-            Get.snackbar("ERROR", "${e.code.toLowerCase()}");
+            showErrorDialog("ERROR", "${e.code.toLowerCase()}");
           }
         } catch (e) {
-          Get.snackbar("ERROR", "Tidak dapat update password");
+          showErrorDialog("ERROR", "Tidak dapat update password");
         } finally {
           isLoading.value = false;
         }
       } else {
-        Get.snackbar("ERROR", "Confirm password tidak sama");
+        showErrorDialog("ERROR", "Confirm password tidak sama");
       }
     } else {
-      Get.snackbar("ERROR", "Semua Input harus diisi");
+      showErrorDialog("ERROR", "Semua Input harus diisi");
     }
+  }
+
+  void showErrorDialog(String title, String desc) {
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.error,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+    ).show();
+  }
+
+  void showSuccessDialog(String title, String desc) {
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.success,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+    ).show();
   }
 }

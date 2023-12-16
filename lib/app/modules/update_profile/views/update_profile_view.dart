@@ -13,9 +13,9 @@ class UpdateProfileView extends GetView<UpdateProfileController> {
     final Map<String, dynamic> user = Get.arguments;
 
     // Assign user data to controller's text fields
-    controller.nimC.text = user['nim'];
-    controller.nameC.text = user['name'];
-    controller.emailC.text = user['email'];
+    controller.nimC.text = user['no hp'];
+    // controller.nameC.text = user['name'];
+    // controller.emailC.text = user['email'];
 
     return Scaffold(
       appBar: AppBar(
@@ -29,34 +29,16 @@ class UpdateProfileView extends GetView<UpdateProfileController> {
               return Center(child: CircularProgressIndicator());
             }
             Map<String, dynamic> user = snapshot.data!.data()!;
+            // user['role'] == 'mahasiswa'?
             return Padding(
               padding: const EdgeInsets.all(20),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    buildTextField(controller.nimC, "NIM", readOnly: true),
+                    if (user['role'] != 'admin')
+                      buildTextField(controller.nimC, "No HP"),
                     SizedBox(height: 20),
-                    buildTextField(controller.nameC, "Name"),
-                    SizedBox(height: 20),
-                    buildTextField(controller.emailC, "Email", readOnly: true),
-                    SizedBox(height: 20),
-                    InputDecorator(
-                      decoration: InputDecoration(
-                        labelText: "Kelas",
-                        border: OutlineInputBorder(),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "${user['kelas']}",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 25),
                     Text("Foto Profile"),
                     SizedBox(height: 20),
                     Row(
@@ -137,6 +119,8 @@ class UpdateProfileView extends GetView<UpdateProfileController> {
     return TextField(
       readOnly: readOnly,
       autocorrect: false,
+      keyboardType: TextInputType.number,
+      maxLength: 12,
       controller: controller,
       decoration: InputDecoration(
         border: OutlineInputBorder(),

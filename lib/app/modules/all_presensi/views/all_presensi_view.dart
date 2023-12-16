@@ -69,23 +69,61 @@ class AllPresensiView extends GetView<AllPresensiController> {
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ),
+                                Divider(
+                                  color: Colors.grey[300],
+                                  thickness: 2,
+                                ),
                                 Text(
-                                  "Masuk",
+                                  data['masuk']?['matkul'] == null
+                                      ? "   "
+                                      : " ( ${data['masuk']?['matkul']} )",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 Text(data['masuk']?['date'] == null
-                                    ? "-"
-                                    : "${DateFormat.jms().format(DateTime.parse(data['masuk']!['date']))}"),
-                                SizedBox(
-                                  height: 10,
+                                    ? " jam : -"
+                                    : "jam : ${DateFormat.jms().format(DateTime.parse(data['masuk']!['date']))}"),
+                                Text(
+                                  "Status : ${data['masuk']?['status']}",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Divider(
+                                  color: Colors.grey[300],
+                                  thickness: 2,
                                 ),
                                 Text(
-                                  "keluar",
+                                  data['keluar']?['matkul'] == null
+                                      ? "  "
+                                      : " ( ${data['keluar']?['matkul']} )",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 Text(data['keluar']?['date'] == null
-                                    ? "-"
-                                    : "${DateFormat.jms().format(DateTime.parse(data['keluar']!['date']))}"),
+                                    ? "jam : -"
+                                    : "jam : ${DateFormat.jms().format(DateTime.parse(data['keluar']!['date']))}"),
+                                Text(
+                                  data['keluar']?['date'] == null
+                                      ? "Status : -  "
+                                      : "Status : ${data['keluar']?['status']}",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Divider(
+                                  color: Colors.grey[300],
+                                  thickness: 2,
+                                ),
+                                Text(
+                                  data['sesi']?['matkul'] == null
+                                      ? "  "
+                                      : "( ${data['sesi']?['matkul']} )",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(data['sesi']?['date'] == null
+                                    ? "jam : -"
+                                    : "jam : ${DateFormat.jms().format(DateTime.parse(data['sesi']!['date']))}"),
+                                Text(
+                                  data['sesi']?['date'] == null
+                                      ? "Status : -  "
+                                      : "Status : ${data['sesi']?['status']}",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ],
                             ),
                           ),

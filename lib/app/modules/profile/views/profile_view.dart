@@ -60,50 +60,132 @@ class ProfileView extends GetView<ProfileController> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "${user['name'].toString().toUpperCase()}",
+                  "${user['name']}",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 20),
                 ),
                 SizedBox(height: 5),
                 Text(
-                  "${user['email']}",
+                  user['role'] == 'admin'
+                      ? "${user['email']}"
+                      : user['role'] == 'mahasiswa'
+                          ? "${user['nim']}"
+                          : "${user['nip']}",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: 10),
                 // if (user['kelas'] != null)
-                user['role'] != "admin"
+                user['kelas'] != null
                     ? Text(
                         "${user['kelas']}",
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16),
                       )
                     : Text(
-                        "${user['admin']}",
+                        "${user['role']}",
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16),
                       ),
 
-                SizedBox(height: 20),
+                SizedBox(height: 10),
+                if (user['role'] == "mahasiswa")
+                  ListTile(
+                    onTap: () =>
+                        Get.toNamed(Routes.DETAIL_MAHASISWA, arguments: user),
+                    leading: Icon(Icons.person),
+                    title: Text("Detail Profile"),
+                  ),
+                if (user['role'] == "dosen")
+                  ListTile(
+                    onTap: () =>
+                        Get.toNamed(Routes.DETAIL_DOSEN, arguments: user),
+                    leading: Icon(Icons.person),
+                    title: Text("Detail Profile"),
+                  ),
+                SizedBox(height: 10),
                 ListTile(
                   onTap: () =>
                       Get.toNamed(Routes.UPDATE_PROFILE, arguments: user),
-                  leading: Icon(Icons.person),
+                  leading: Icon(Icons.people_alt),
                   title: Text("Update Profile"),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 ListTile(
                   onTap: () => Get.toNamed(Routes.UPDATE_PASSWORD),
                   leading: Icon(Icons.password),
                   title: Text("Update Password"),
                 ),
-                SizedBox(height: 20),
                 if (user['role'] == "admin")
                   ListTile(
-                    onTap: () => Get.toNamed(Routes.ADD_PEGAWAI),
-                    leading: Icon(Icons.person_add),
-                    title: Text("Add Mahasiswa"),
+                    onTap: () =>
+                        Get.toNamed(Routes.LIST_MAHASISWA, arguments: user),
+                    leading: Icon(Icons.person),
+                    title: Text(" Data Mahasiswa"),
                   ),
+                if (user['role'] == "admin")
+                  ListTile(
+                    onTap: () =>
+                        Get.toNamed(Routes.LIST_DOSEN, arguments: user),
+                    leading: Icon(Icons.person_2_outlined),
+                    title: Text(" Data Dosen"),
+                  ),
+                SizedBox(height: 10),
+                if (user['role'] == "admin")
+                  ListTile(
+                    onTap: () {
+                      // Menampilkan dialog saat card di-tap
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text("Pilih Aksi"),
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Get.toNamed(Routes.LIST_JADWAL,
+                                      arguments: user);
+                                },
+                                child: Text("Jadwal Mahasiswa"),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Get.toNamed(Routes.LIST_JADWAL_DOSEN,
+                                      arguments: user);
+                                },
+                                child: Text("Jadwal Dosen"),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text("Cancel"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    leading: Icon(Icons.list),
+                    title: Text("jadwal"),
+                  ),
+                if (user['role'] == "mahasiswa")
+                  ListTile(
+                    onTap: () => Get.toNamed(Routes.LIST_JADWAL),
+                    leading: Icon(Icons.list),
+                    title: Text("jadwal"),
+                  ),
+                // SizedBox(height: 20),
+                if (user['role'] == "dosen")
+                  ListTile(
+                    onTap: () => Get.toNamed(Routes.LIST_JADWAL_DOSEN),
+                    leading: Icon(Icons.list),
+                    title: Text("jadwal"),
+                  ),
+                // SizedBox(height: 20),
+                SizedBox(height: 10),
                 ListTile(
                   onTap: () => controller.logout(),
                   leading: Icon(Icons.logout),
