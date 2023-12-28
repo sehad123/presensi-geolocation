@@ -155,8 +155,8 @@ class ListJadwalView extends GetView<ListJadwalController> {
                                 SizedBox(
                                   height: 5,
                                 ),
-                                if (user?['role'] != 'dosen' ||
-                                    user?['role'] == 'admin')
+                                if (user?['role'] != 'dosen' &&
+                                    user?['role'] != 'admin')
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [

@@ -144,16 +144,24 @@ class AddJadwalController extends GetxController {
         return [
           DropdownMenuItem(value: 'Data Mining', child: Text('Data Mining')),
           DropdownMenuItem(
+              value: 'Teknologi Big Data', child: Text('Teknologi Big Data')),
+          DropdownMenuItem(
+              value: 'Kecerdasan Buatan', child: Text('Kecerdasan Buatan')),
+          DropdownMenuItem(
               value: 'Interaksi Komputer dan Manusia',
               child: Text('Interaksi Komputer dan Manusia')),
           DropdownMenuItem(
-              value: 'Oficial Statistik', child: Text('Oficial Statistik')),
+              value: 'Oficial Statistik Lanjutan',
+              child: Text('Oficial Statistik Lanjutan')),
           DropdownMenuItem(
               value: 'Sistem Jaringan Keamanan',
               child: Text('Sistem Jaringan Keamanan')),
-          DropdownMenuItem(value: 'Big Data ', child: Text('Big Data ')),
           DropdownMenuItem(
-              value: 'Machine Learning', child: Text('Machine Learning')),
+              value: 'Teknologi Perekayasaan Data ',
+              child: Text('Teknologi Perekayasaan Data ')),
+          DropdownMenuItem(
+              value: 'Visualisasi Data dan Informasi',
+              child: Text('Visualisasi Data dan Informasi')),
         ];
       default:
         return [];
