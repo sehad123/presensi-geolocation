@@ -37,7 +37,9 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "( ${data['masuk']?['matkul']} )",
+                    data['masuk']?['matkul'] != null
+                        ? "( ${data['masuk']?['matkul']} )"
+                        : " - ",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -46,19 +48,29 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                 height: 5,
               ),
               Text(
-                "jam : ${DateFormat.jms().format(DateTime.parse(data['masuk']['date']))}",
+                data['masuk']?['date'] == null
+                    ? "Jam : -"
+                    : "jam :  ${DateFormat.jms().format(DateTime.parse(data['masuk']['date']))}",
               ),
               Text(
-                "posisi : ${data['masuk']!['lat']}, ${data['masuk']!['long']}",
+                data['masuk']?['lat'] == null && data['masuk']?['long'] == null
+                    ? "Posisi : -"
+                    : "Posisi : ${data['masuk']!['lat']}, ${data['masuk']!['long']}",
               ),
               Text(
-                "status : ${data['masuk']?['status']}",
+                data['masuk']?['status'] == null
+                    ? "Status : -"
+                    : "Status : ${data['masuk']?['status']}",
               ),
               Text(
-                "Alamat : ${data['masuk']?['address']}",
+                data['masuk']?['status'] == null
+                    ? "Lokasi Absen : -"
+                    : "Lokasi Absen : ${data['masuk']?['address']}",
               ),
               Text(
-                "Jarak : ${data['masuk']?['jarak'].toString().split(".").first} meter",
+                data['masuk']?['status'] == null
+                    ? "Jarak : -"
+                    : "Jarak : ${data['masuk']?['jarak'].toString().split(".").first} meter",
               ),
               SizedBox(
                 height: 10,
@@ -71,7 +83,9 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "( ${data['keluar']?['matkul']} )",
+                    data['keluar']?['matkul'] != null
+                        ? "( ${data['keluar']?['matkul']} )"
+                        : "- ",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -87,18 +101,18 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
               Text(
                 data['keluar']?['lat'] == null &&
                         data['keluar']?['long'] == null
-                    ? "posisi : -"
-                    : "posisi : ${data['keluar']!['lat']}, ${data['keluar']!['long']}",
+                    ? "Posisi : -"
+                    : "Posisi : ${data['keluar']!['lat']}, ${data['keluar']!['long']}",
               ),
               Text(
                 data['keluar']?['status'] == null
-                    ? "status : -"
-                    : "status : ${data['keluar']?['status']}",
+                    ? "Status : -"
+                    : "Status : ${data['keluar']?['status']}",
               ),
               Text(
                 data['keluar']?['status'] == null
-                    ? "Alamat : -"
-                    : "Alamat : ${data['keluar']?['address']}",
+                    ? "Lokasi Absen : -"
+                    : "Lokasi Absen : ${data['keluar']?['address']}",
               ),
               Text(
                 data['keluar']?['status'] == null
@@ -116,7 +130,9 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "( ${data['sesi']?['matkul']} )",
+                    data['sesi']?['matkul'] != null
+                        ? "( ${data['sesi']?['matkul']} )"
+                        : " - ",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -125,19 +141,29 @@ class DetailPresensiView extends GetView<DetailPresensiController> {
                 height: 5,
               ),
               Text(
-                "jam : ${DateFormat.jms().format(DateTime.parse(data['sesi']['date']))}",
+                data['sesi']?['date'] == null
+                    ? "Jam : -"
+                    : "Jam : ${DateFormat.jms().format(DateTime.parse(data['sesi']['date']))}",
               ),
               Text(
-                "posisi : ${data['sesi']!['lat']}, ${data['sesi']!['long']}",
+                data['sesi']?['lat'] == null && data['sesi']?['long'] == null
+                    ? "Posisi : -"
+                    : "Posisi : ${data['sesi']!['lat']}, ${data['sesi']!['long']}",
               ),
               Text(
-                "status : ${data['sesi']?['status']}",
+                data['sesi']?['status'] == null
+                    ? "Status : -"
+                    : "Status : ${data['sesi']?['status']}",
               ),
               Text(
-                "Alamat : ${data['sesi']?['address']}",
+                data['sesi']?['status'] == null
+                    ? "Lokasi Absen : -"
+                    : "Lokasi Absen : ${data['sesi']?['address']}",
               ),
               Text(
-                "Jarak : ${data['sesi']?['jarak'].toString().split(".").first} meter",
+                data['sesi']?['status'] == null
+                    ? "Jarak : -"
+                    : "Jarak : ${data['sesi']?['jarak'].toString().split(".").first} meter",
               ),
             ]),
             decoration: BoxDecoration(
