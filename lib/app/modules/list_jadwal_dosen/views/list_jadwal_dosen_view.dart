@@ -273,20 +273,29 @@ class ListJadwalDosenView extends GetView<ListJadwalDosenController> {
   String getFormattedDate(String? day) {
     if (day != null) {
       DateTime now = DateTime.now();
+      DateTime selectedDate;
+
       switch (day) {
         case 'Senin':
-          return "Senin ${DateFormat('d MMMM yyyy').format(now)}";
+          selectedDate = now.subtract(Duration(days: now.weekday - 1));
+          break;
         case 'Selasa':
-          return "Selasa ${DateFormat('d MMMM yyyy').format(now.add(Duration(days: 1)))}";
+          selectedDate = now.subtract(Duration(days: now.weekday - 2));
+          break;
         case 'Rabu':
-          return "Rabu ${DateFormat('d MMMM yyyy').format(now.add(Duration(days: 2)))}";
+          selectedDate = now.subtract(Duration(days: now.weekday - 3));
+          break;
         case 'Kamis':
-          return "Kamis ${DateFormat('d MMMM yyyy').format(now.add(Duration(days: 3)))}";
+          selectedDate = now.subtract(Duration(days: now.weekday - 4));
+          break;
         case 'Jumat':
-          return "Jumat ${DateFormat('d MMMM yyyy').format(now.add(Duration(days: 4)))}";
+          selectedDate = now.subtract(Duration(days: now.weekday - 5));
+          break;
         default:
           return "Hari tidak valid";
       }
+
+      return "${day} ${DateFormat('d MMMM yyyy').format(selectedDate)}";
     }
     return "Hari tidak valid";
   }
