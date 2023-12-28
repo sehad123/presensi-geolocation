@@ -23,10 +23,59 @@ class AddJadwalController extends GetxController {
   RxString selectedProdi = "".obs;
   RxString selectedHari = "".obs;
   RxString selectedMatkul = "".obs;
-  // RxString selectedRole = "".obs;
 
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  RxList<DropdownMenuItem<String>> dosenDropdownItems =
+      <DropdownMenuItem<String>>[].obs;
+
+  RxList<DropdownMenuItem<String>> ruanganDropdownItems =
+      <DropdownMenuItem<String>>[].obs;
+
+  Future<List<String>> fetchRuangan() async {
+    try {
+      isLoading.value = true;
+
+      var querySnapshot = await firestore
+          .collection("ruangan")
+          .where('status', isEqualTo: 'ada')
+          .get();
+
+      List<String> ruanganList =
+          querySnapshot.docs.map((doc) => doc['nomor'] as String).toList();
+
+      return ruanganList;
+    } catch (e) {
+      print("$e");
+      return [];
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<List<String>> fetchDosen() async {
+    try {
+      isLoading.value = true;
+      var querySnapshot = await firestore
+          .collection("mahasiswa")
+          .where('role', isEqualTo: 'dosen')
+          .get();
+
+      // Extract dosen names from the querySnapshot
+      List<String> dosenList = querySnapshot.docs
+          .map((doc) =>
+              doc['name'] as String) // Assuming the field is named 'name'
+          .toList();
+
+      return dosenList;
+    } catch (e) {
+      print("$e");
+      return [];
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   Future<void> prosesAddMahasiswa() async {
     try {
@@ -53,6 +102,7 @@ class AddJadwalController extends GetxController {
         // "role": "mahasiswa",
         "createdAt": FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
+      await updateRuangan(RuanganC.text);
 
       Get.back();
       Get.back();
@@ -71,6 +121,40 @@ class AddJadwalController extends GetxController {
     }
   }
 
+  void addRuangan() async {
+    if (RuanganC.text.isEmpty || RuanganC.text.isNotEmpty) {
+      // Call fetchRuangan to get the list of ruangan numbers
+      List<String> ruanganList = await fetchRuangan();
+
+      // Update the ruanganDropdownItems with the fetched ruangan numbers
+      ruanganDropdownItems.value = ruanganList.map((nomor) {
+        return DropdownMenuItem(value: nomor, child: Text(nomor));
+      }).toList();
+
+      // Show the dropdown dialog
+      showRuanganDropdown();
+    } else {
+      showErrorDialog("Peringatan", "Semua data harus diisi.");
+    }
+  }
+
+  void addDosen() async {
+    if (dosenC.text.isEmpty || dosenC.text.isNotEmpty) {
+      // Call fetchDosen to get the list of dosen names
+      List<String> dosenList = await fetchDosen();
+
+      // Update the dosenDropdownItems with the fetched dosen names
+      dosenDropdownItems.value = dosenList.map((name) {
+        return DropdownMenuItem(value: name, child: Text(name));
+      }).toList();
+
+      // Show the dropdown dialog
+      showDosenDropdown();
+    } else {
+      showErrorDialog("Peringatan", "Semua data harus diisi.");
+    }
+  }
+
   void addPegawai() async {
     if (dosenC.text.isNotEmpty &&
         RuanganC.text.isNotEmpty &&
@@ -85,10 +169,69 @@ class AddJadwalController extends GetxController {
         selectedProdi.isNotEmpty &&
         kodeC.text.isNotEmpty) {
       isLoading.value = true;
+      await updateRuangan(RuanganC.text);
       await prosesAddMahasiswa();
     } else {
       showErrorDialog("Peringatan", "Semua data harus diisi.");
     }
+  }
+
+  // Add an RxList to hold the dropdown items for dosen
+
+  void showRuanganDropdown() {
+    Get.defaultDialog(
+      title: 'Pilih Ruangan',
+      content: Container(
+        width: Get.width * 0.7,
+        child: DropdownButtonFormField<String>(
+          value: null,
+          onChanged: (value) {
+            RuanganC.text = value!;
+            Get.back();
+          },
+          items: ruanganDropdownItems,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: "Ruangan",
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> updateRuangan(String nomor) async {
+    try {
+      isLoading.value = true;
+      Map<String, dynamic> data = {
+        "status": "terpakai",
+      };
+      await firestore.collection("ruangan").doc(nomor).update(data);
+      isLoading.value = false;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+// Function to show the dosen dropdown
+  void showDosenDropdown() {
+    Get.defaultDialog(
+      title: 'Pilih Dosen',
+      content: Container(
+        width: Get.width * 0.7,
+        child: DropdownButtonFormField<String>(
+          value: null,
+          onChanged: (value) {
+            dosenC.text = value!;
+            Get.back();
+          },
+          items: dosenDropdownItems,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: "Dosen",
+          ),
+        ),
+      ),
+    );
   }
 
   void showErrorDialog(String title, String desc) {

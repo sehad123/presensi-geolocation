@@ -30,6 +30,9 @@ abstract class Routes {
   static const LIST_JADWAL = _Paths.LIST_JADWAL;
   static const LIST_JADWAL_DOSEN = _Paths.LIST_JADWAL_DOSEN;
   static const ADD_JADWAL_DOSEN = _Paths.ADD_JADWAL_DOSEN;
+  static const LIST_RUANGAN = _Paths.LIST_RUANGAN;
+  static const EDIT_RUANGAN = _Paths.EDIT_RUANGAN;
+  static const ADD_RUANGAN = _Paths.ADD_RUANGAN;
 }
 
 abstract class _Paths {
@@ -61,4 +64,7 @@ abstract class _Paths {
   static const LIST_JADWAL = '/list-jadwal';
   static const LIST_JADWAL_DOSEN = '/list-jadwal-dosen';
   static const ADD_JADWAL_DOSEN = '/add-jadwal-dosen';
+  static const LIST_RUANGAN = '/list-ruangan';
+  static const EDIT_RUANGAN = '/edit-ruangan';
+  static const ADD_RUANGAN = '/add-ruangan';
 }

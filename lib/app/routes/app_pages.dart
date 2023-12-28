@@ -8,6 +8,8 @@ import '../modules/add_jadwal_dosen/bindings/add_jadwal_dosen_binding.dart';
 import '../modules/add_jadwal_dosen/views/add_jadwal_dosen_view.dart';
 import '../modules/add_pegawai/bindings/add_pegawai_binding.dart';
 import '../modules/add_pegawai/views/add_pegawai_view.dart';
+import '../modules/add_ruangan/bindings/add_ruangan_binding.dart';
+import '../modules/add_ruangan/views/add_ruangan_view.dart';
 import '../modules/all_presensi/bindings/all_presensi_binding.dart';
 import '../modules/all_presensi/views/all_presensi_view.dart';
 import '../modules/detail_dosen/bindings/detail_dosen_binding.dart';
@@ -24,6 +26,8 @@ import '../modules/edit_detail_mahasiswa/bindings/edit_detail_mahasiswa_binding.
 import '../modules/edit_detail_mahasiswa/views/edit_detail_mahasiswa_view.dart';
 import '../modules/edit_jadwal/bindings/edit_jadwal_binding.dart';
 import '../modules/edit_jadwal/views/edit_jadwal_view.dart';
+import '../modules/edit_ruangan/bindings/edit_ruangan_binding.dart';
+import '../modules/edit_ruangan/views/edit_ruangan_view.dart';
 import '../modules/forget_password/bindings/forget_password_binding.dart';
 import '../modules/forget_password/views/forget_password_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -38,6 +42,8 @@ import '../modules/list_jadwal_dosen/bindings/list_jadwal_dosen_binding.dart';
 import '../modules/list_jadwal_dosen/views/list_jadwal_dosen_view.dart';
 import '../modules/list_mahasiswa/bindings/list_mahasiswa_binding.dart';
 import '../modules/list_mahasiswa/views/list_mahasiswa_view.dart';
+import '../modules/list_ruangan/bindings/list_ruangan_binding.dart';
+import '../modules/list_ruangan/views/list_ruangan_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/new_password/bindings/new_password_binding.dart';
@@ -190,6 +196,21 @@ class AppPages {
       name: _Paths.LIST_JADWAL_DOSEN,
       page: () => const ListJadwalDosenView(),
       binding: ListJadwalDosenBinding(),
+    ),
+    GetPage(
+      name: _Paths.LIST_RUANGAN,
+      page: () => const ListRuanganView(),
+      binding: ListRuanganBinding(),
+    ),
+    GetPage(
+      name: _Paths.EDIT_RUANGAN,
+      page: () => const EditRuanganView(),
+      binding: EditRuanganBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADD_RUANGAN,
+      page: () => const AddRuanganView(),
+      binding: AddRuanganBinding(),
     ),
   ];
 }

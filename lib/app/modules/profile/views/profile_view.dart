@@ -64,7 +64,7 @@ class ProfileView extends GetView<ProfileController> {
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(height: 5),
+                SizedBox(height: 10),
                 Text(
                   user['role'] == 'admin'
                       ? "${user['email']}"
@@ -75,6 +75,7 @@ class ProfileView extends GetView<ProfileController> {
                   style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: 10),
+
                 // if (user['kelas'] != null)
                 user['kelas'] != null
                     ? Text(
@@ -87,8 +88,8 @@ class ProfileView extends GetView<ProfileController> {
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16),
                       ),
-
                 SizedBox(height: 10),
+
                 if (user['role'] == "mahasiswa")
                   ListTile(
                     onTap: () =>
@@ -103,14 +104,12 @@ class ProfileView extends GetView<ProfileController> {
                     leading: Icon(Icons.person),
                     title: Text("Detail Profile"),
                   ),
-                SizedBox(height: 10),
                 ListTile(
                   onTap: () =>
                       Get.toNamed(Routes.UPDATE_PROFILE, arguments: user),
                   leading: Icon(Icons.people_alt),
                   title: Text("Update Profile"),
                 ),
-                SizedBox(height: 10),
                 ListTile(
                   onTap: () => Get.toNamed(Routes.UPDATE_PASSWORD),
                   leading: Icon(Icons.password),
@@ -130,7 +129,13 @@ class ProfileView extends GetView<ProfileController> {
                     leading: Icon(Icons.person_2_outlined),
                     title: Text(" Data Dosen"),
                   ),
-                SizedBox(height: 10),
+                if (user['role'] == "admin")
+                  ListTile(
+                    onTap: () =>
+                        Get.toNamed(Routes.LIST_RUANGAN, arguments: user),
+                    leading: Icon(Icons.room_preferences_outlined),
+                    title: Text(" Ruangan"),
+                  ),
                 if (user['role'] == "admin")
                   ListTile(
                     onTap: () {
@@ -185,7 +190,6 @@ class ProfileView extends GetView<ProfileController> {
                     title: Text("jadwal"),
                   ),
                 // SizedBox(height: 20),
-                SizedBox(height: 10),
                 ListTile(
                   onTap: () => controller.logout(),
                   leading: Icon(Icons.logout),

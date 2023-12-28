@@ -26,16 +26,44 @@ class ListJadwalDosenController extends GetxController {
     fetchJadwal();
   }
 
+  Stream<DocumentSnapshot<Map<String, dynamic>>> streamUser() {
+    String uid = auth.currentUser!.uid;
+    return firestore.collection("mahasiswa").doc(uid).snapshots();
+  }
+
   void fetchJadwal() async {
     try {
       isLoading.value = true;
-      var querySnapshot = await firestore
-          .collection("jadwal")
-          .where('role', isEqualTo: 'dosen')
-          .get();
+      isLoading.value = true;
+      String uid = auth.currentUser!.uid;
 
-      jadwalList.assignAll(querySnapshot.docs.map((doc) => doc.data()));
-      filterJadwalByDay(selectedDay.value); // Filter initially
+      // Ambil dokumen pengguna
+      DocumentSnapshot<Map<String, dynamic>> userDoc =
+          await firestore.collection("mahasiswa").doc(uid).get();
+
+      // Ambil prodi dari dokumen pengguna
+      String nama = userDoc.data()?['name'] ?? '';
+      String roles = userDoc.data()?['role'] ?? '';
+
+      // Query jadwal berdasarkan role, nama, dll.
+      if (roles == 'admin') {
+        var querySnapshot = await firestore
+            .collection("jadwal")
+            .where('role', isEqualTo: 'dosen')
+            .get();
+
+        jadwalList.assignAll(querySnapshot.docs.map((doc) => doc.data()));
+        filterJadwalByDay(selectedDay.value); // Filter initially
+      } else {
+        var querySnapshot = await firestore
+            .collection("jadwal")
+            .where('role', isEqualTo: 'dosen')
+            .where('dosen', isEqualTo: nama)
+            .get();
+
+        jadwalList.assignAll(querySnapshot.docs.map((doc) => doc.data()));
+        filterJadwalByDay(selectedDay.value); // Filter initially
+      }
     } catch (e) {
       print("Error fetching jadwal: $e");
     } finally {
@@ -76,10 +104,6 @@ class ListJadwalDosenController extends GetxController {
   void searchJadwal(String keyword) {
     searchKeyword.value = keyword;
     filterJadwal();
-  }
-
-  Stream<DocumentSnapshot<Map<String, dynamic>>> streamUser(String uid) {
-    return firestore.collection("jadwal").doc(uid).snapshots();
   }
 
   Future<void> deleteJadwal(String uid) async {

@@ -134,23 +134,39 @@ class AddJadwalView extends GetView<AddJadwalController> {
               ),
             ),
             SizedBox(height: 20),
-            TextField(
-              maxLength: 3,
-              autocorrect: false,
-              keyboardType: TextInputType.number,
-              controller: controller.RuanganC,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: "Ruangan ",
+            InkWell(
+              onTap: () {
+                if (controller.isLoading.isFalse) {
+                  controller.addRuangan();
+                }
+              },
+              child: AbsorbPointer(
+                child: TextField(
+                  autocorrect: false,
+                  controller: controller.RuanganC,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Ruangan",
+                  ),
+                ),
               ),
             ),
             SizedBox(height: 20),
-            TextField(
-              autocorrect: false,
-              controller: controller.dosenC,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: "Dosen",
+            InkWell(
+              onTap: () {
+                if (controller.isLoading.isFalse) {
+                  controller.addDosen();
+                }
+              },
+              child: AbsorbPointer(
+                child: TextField(
+                  autocorrect: false,
+                  controller: controller.dosenC,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Dosen",
+                  ),
+                ),
               ),
             ),
             SizedBox(height: 20),

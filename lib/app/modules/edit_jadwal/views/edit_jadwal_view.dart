@@ -58,7 +58,23 @@ class EditJadwalView extends GetView<EditJadwalController> {
               SizedBox(
                 height: 20,
               ),
-              buildTextField(controller.dosenC, "Dosen"),
+              InkWell(
+                onTap: () {
+                  if (controller.isLoading.isFalse) {
+                    controller.updateDosen(user['uid']);
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextField(
+                    autocorrect: false,
+                    controller: controller.dosenC,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: "Dosen",
+                    ),
+                  ),
+                ),
+              ),
               SizedBox(height: 20),
               TextField(
                 controller: controller.JamMC,
@@ -128,7 +144,23 @@ class EditJadwalView extends GetView<EditJadwalController> {
                 ),
               ),
               SizedBox(height: 20),
-              buildTextField(controller.ruanganC, "Ruangan"),
+              InkWell(
+                onTap: () {
+                  if (controller.isLoading.isFalse) {
+                    controller.updateRuangan(user['uid']);
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextField(
+                    autocorrect: false,
+                    controller: controller.ruanganC,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: "Ruangan",
+                    ),
+                  ),
+                ),
+              ),
               SizedBox(height: 20),
               Obx(
                 () => Column(
