@@ -13,6 +13,18 @@ import '../controllers/home_controller.dart';
 class HomeView extends GetView<HomeController> {
   HomeView({Key? key}) : super(key: key);
   final pageC = Get.find<PageIndexController>();
+  String getGreeting() {
+    var hour = DateTime.now().hour;
+    if (hour < 12) {
+      return "Selamat Pagi";
+    } else if (hour < 15) {
+      return "Selamat Siang";
+    } else if (hour < 18) {
+      return "Selamat Sore";
+    } else {
+      return "Selamat Malam";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +81,7 @@ class HomeView extends GetView<HomeController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Selamat Pagi",
+                            getGreeting(),
                             style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
