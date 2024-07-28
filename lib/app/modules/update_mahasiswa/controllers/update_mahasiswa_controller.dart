@@ -2,7 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presensi/app/routes/app_pages.dart';
+import 'package:intl/intl.dart';
 
 class UpdateMahasiswaController extends GetxController {
   RxBool isLoading = false.obs;
@@ -10,42 +10,58 @@ class UpdateMahasiswaController extends GetxController {
   TextEditingController statusKC = TextEditingController();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  Future<void> updateMasukStatus(
-    String uid,
-    String todayDocId,
-  ) async {
-    showErrorDialog(
-        "Updating masuk status for UID: $uid, Date: $todayDocId", "");
+  Future<void> updateMasukStatus(String uid, String todayDocId) async {
+    try {
+      isLoading.value = true;
 
-    CollectionReference<Map<String, dynamic>> collectionReference =
-        await firestore.collection("mahasiswa").doc(uid).collection("presensi");
+      CollectionReference<Map<String, dynamic>> collectionReference =
+          firestore.collection("mahasiswa").doc(uid).collection("presensi");
 
-    await collectionReference.doc(todayDocId).update({
-      "masuk.status": statusMC.text,
-    });
+      DocumentSnapshot<Map<String, dynamic>> todayDoc =
+          await collectionReference.doc(todayDocId).get();
 
-    Get.back();
-    showSuccessDialog("BERHASIL", "Berhasil ubah status kehadiran");
+      if (todayDoc.exists) {
+        await collectionReference.doc(todayDocId).update({
+          "masuk.status": statusMC.text,
+        });
+
+        Get.back();
+        showSuccessDialog("BERHASIL", "Berhasil ubah status kehadiran masuk");
+      } else {
+        showErrorDialog("Error", "Dokumen hari ini tidak ditemukan");
+      }
+    } catch (e) {
+      showErrorDialog("Gagal", "Gagal ubah status kehadiran masuk: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  Future<void> updateKeluarStatus(
-    String uid,
-    String todayDocId,
-  ) async {
-    showErrorDialog(
-        "Updating masuk status for UID: $uid, Date: $todayDocId", "");
-    CollectionReference<Map<String, dynamic>> collectionReference =
-        await firestore.collection("mahasiswa").doc(uid).collection("presensi");
-    print("Uid = ${uid}");
-    print("todau = ${todayDocId}");
-    await collectionReference.doc(todayDocId).update({
-      "keluar.status": statusKC.text,
-    });
-    print("Uid = ${uid}");
-    print("todau = ${todayDocId}");
+  Future<void> updateKeluarStatus(String uid, String todayDocId) async {
+    try {
+      isLoading.value = true;
 
-    Get.back();
-    showSuccessDialog("BERHASIL", "Berhasil ubah status kehadiran");
+      CollectionReference<Map<String, dynamic>> collectionReference =
+          firestore.collection("mahasiswa").doc(uid).collection("presensi");
+
+      DocumentSnapshot<Map<String, dynamic>> todayDoc =
+          await collectionReference.doc(todayDocId).get();
+
+      if (todayDoc.exists) {
+        await collectionReference.doc(todayDocId).update({
+          "keluar.status": statusKC.text,
+        });
+
+        Get.back();
+        showSuccessDialog("BERHASIL", "Berhasil ubah status kehadiran keluar");
+      } else {
+        showErrorDialog("Error", "Dokumen hari ini tidak ditemukan");
+      }
+    } catch (e) {
+      showErrorDialog("Gagal", "Gagal ubah status kehadiran keluar: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void showErrorDialog(String title, String desc) {
@@ -64,7 +80,10 @@ class UpdateMahasiswaController extends GetxController {
       dialogType: DialogType.success,
       title: title,
       desc: desc,
-      btnOkOnPress: () {},
+      btnOkOnPress: () {
+        Get.back(
+            result: true); // Use Get.back with result true to trigger refresh
+      },
     ).show();
   }
 }

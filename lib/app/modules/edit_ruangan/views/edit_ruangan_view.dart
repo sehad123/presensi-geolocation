@@ -21,7 +21,7 @@ class EditRuanganView extends GetView<EditRuanganController> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Dosen'),
+        title: const Text('Update Ruangan'),
         centerTitle: true,
       ),
       body: Padding(
@@ -37,7 +37,7 @@ class EditRuanganView extends GetView<EditRuanganController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Mata Kuliah yang diampu', // Add your label here
+                      'Status Ruangan', // Add your label here
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

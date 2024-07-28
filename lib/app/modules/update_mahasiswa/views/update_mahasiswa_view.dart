@@ -1,6 +1,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../controllers/update_mahasiswa_controller.dart';
 
 class UpdateMahasiswaView extends GetView<UpdateMahasiswaController> {
@@ -8,11 +9,9 @@ class UpdateMahasiswaView extends GetView<UpdateMahasiswaController> {
 
   @override
   Widget build(BuildContext context) {
-    // Retrieve user data from arguments
     final Map<String, dynamic>? data = Get.arguments?["data"];
     final Map<String, dynamic>? data2 = Get.arguments?["data2"];
 
-    // Check if data and data2 are not null
     if (data == null || data2 == null || data2['uid'] == null) {
       return Scaffold(
         body: Center(
@@ -21,10 +20,8 @@ class UpdateMahasiswaView extends GetView<UpdateMahasiswaController> {
       );
     }
 
-    // Assign user data to controller's text fields
     controller.statusMC.text = data['masuk']?['status'] ?? '';
     controller.statusKC.text = data['keluar']?['status'] ?? '';
-    print(data2['uid']);
 
     return Scaffold(
       appBar: AppBar(
@@ -43,25 +40,28 @@ class UpdateMahasiswaView extends GetView<UpdateMahasiswaController> {
               SizedBox(height: 25),
               ElevatedButton(
                 onPressed: () async {
-                  // Check if uid and date are not null before updating
                   if (data2['uid'] != null && data['date'] != null) {
+                    String todayDocId = DateFormat.yMd()
+                        .format(DateTime.parse(data['date']))
+                        .replaceAll("/", "-");
+
                     await controller.updateMasukStatus(
                       data2['uid'].toString(),
-                      data['date'].toIso8601String(),
+                      todayDocId,
                     );
                     await controller.updateKeluarStatus(
                       data2['uid'].toString(),
-                      data['date'].toIso8601String(),
+                      todayDocId,
                     );
                   } else {
-                    // Handle the case where uid or date is null
-                    // You can show an error message or log the issue
-                    showErrorDialog("Error: uid or date is null", "");
+                    showErrorDialog("Error: uid atau date tidak valid", "");
                   }
                 },
-                child: Text(
-                  controller.isLoading.value ? "LOADING" : "Update Status",
-                ),
+                child: Obx(() {
+                  return Text(
+                    controller.isLoading.value ? "LOADING" : "Update Status",
+                  );
+                }),
               ),
             ],
           ),
